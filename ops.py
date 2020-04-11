@@ -174,7 +174,7 @@ def total_variation(images, name=None):
 
 def binary_label_loss(hat_c, hat_cls):
     _, r = hat_c.shape
-    h = r/np.linalg.norm(hat_c, axis = 1)
+    h = r/np.linalg.norm(hat_c, ord = 1, axis = 1)
     B = np.zeros(hat_c.shape)
 
     bar_c = tf.where(tf.equal(hat_c, -1), B, hat_c) # label operator
