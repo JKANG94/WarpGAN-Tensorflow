@@ -1,7 +1,7 @@
 <p align="center"><img width="40%" src="./assests/logo.jpg" /></p>
 
 --------------------------------------------------------------------------------
-This repository provides the tensorflow implementation of the following paper:
+This repository provides the tensorflow implementation of the following paper:<br/>
 The GAN that Warped: Semantic Attribute Editing with Unpaired Data
 Garoe Dorta Sara Vicente Neill D.F. Campbell Ivor J.A. Simpson 
 
