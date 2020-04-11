@@ -2,8 +2,8 @@
 
 --------------------------------------------------------------------------------
 This repository provides the tensorflow implementation of the following paper:<br/>
-The GAN that Warped: Semantic Attribute Editing with Unpaired Data
-Garoe Dorta Sara Vicente Neill D.F. Campbell Ivor J.A. Simpson 
+The GAN that Warped: Semantic Attribute Editing with Unpaired Data<br/>
+<a href='https://garoe.github.io/Sara' target='_blank'>Garoe Dorta</a> Vicente Neill D.F. Campbell Ivor J.A. Simpson 
 
 ## Requirements
 * Tensorflow 1.8
