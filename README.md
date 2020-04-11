@@ -1,4 +1,4 @@
-<p align="center"><img width="40%" src="./assests/logo.jpg" /></p>
+<p align="center"><img width="100%" src="./assests/logo.jpg" /></p>
 
 --------------------------------------------------------------------------------
 This repository provides the tensorflow implementation of the following paper:<br/>
@@ -38,10 +38,10 @@ Garoe Dorta Sara Vicente Neill D.F. Campbell Ivor J.A. Simpson
 
 ## Results (128x128)
 ### Women
-![women](./assests/women.png)
+![women](./assests/women.jpg)
 
 ### Men
-![men](./assests/men.png)
+![men](./assests/man.jpg)
 
 ## Reference
 * [WarpGAN paper](https://garoe.github.io/papers/warp_gan_2020.pdf)
