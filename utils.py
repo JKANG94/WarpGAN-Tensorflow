@@ -183,7 +183,7 @@ def dense_flows_to_remap(dense_flows):
     x_idx = np.arange(shape[0], dtype = np.float32)
     x_idx = np.tile(x_idx[..., np.newaxis], (1, shape[1]))
     y_idx = np.arange(shape[1], dtype = np.float32)
-    y_idx = np.tile(y_idx[np.newaxis, ...], (shapep[0], 1))
+    y_idx = np.tile(y_idx[np.newaxis, ...], (shape[0], 1))
 
     y_idx -= dense_flows[:, :, 1]
     x_idx -= dense_flows[:, :, 0]

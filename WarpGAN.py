@@ -84,8 +84,8 @@ class WarpGAN(object) :
         c = tf.cast(tf.reshape(c, shape=[-1, 1, 1, c.shape[-1]]), tf.float32)
         c = tf.tile(c, [1, x_init.shape[1], x_init.shape[2], 1])
         x = tf.concat([x_init, c], axis=-1)
-        h = self.img_size / 4  # 32
-        w = self.img_size / 4  # 32
+        h = int(self.img_size / 4)  # 32
+        w = int(self.img_size / 4)  # 32
 
         with tf.variable_scope(scope, reuse=reuse) :
             x = conv(x, channel, kernel=7, stride=1, pad=3, use_bias=False, scope='conv')
@@ -107,7 +107,7 @@ class WarpGAN(object) :
             # Up-Sampling
 
             for i in range(2) :
-                tf.image.resize_bilinear(x, [2 * h, 2 * w])
+                x = tf.image.resize_bilinear(x, [2 * h, 2 * w])
                 x = conv(x, channel//2, kernel=3, stride=1, pad = 1, use_bias=False, scope='conv_'+str(i))
                 x = relu(x)
                 x = batch_norm(x, scope='up_bat_norm'+str(i))
@@ -118,7 +118,7 @@ class WarpGAN(object) :
 
             x = conv(x, channels=2, kernel=7, stride=1, pad=3, use_bias=False, scope='G_logit')
             w = x
-            x = tf.contrib.image.dense_image_warp(x_init, w)
+            x = tf_contrib.image.dense_image_warp(x_init, w)
 
             return x, w
 
@@ -231,13 +231,13 @@ class WarpGAN(object) :
         fake_logit, fake_cls = self.discriminator(x_fake, reuse=True)
 
         # warp cycle
-        A_fake = contrib.image.dense_image_warp(A, w_fake)
-        A_cycle = contrib.image.dense_image_warp(A_fake, w_recon)
+        A_fake = tf_contrib.image.dense_image_warp(A, w_fake)
+        A_cycle = tf_contrib.image.dense_image_warp(A_fake, w_recon)
 
         # binary label transformation
         dist = tf_contrib.distributions.Categorical(probs=[0.25, 0.5, 0.25])
         hat_c = dist.sample([self.batch_size, self.c_dim]) - 1
-        hat_c_numpy = hat_c.eval()
+        hat_c_numpy = hat_c.eval().astype('float32')
         hat_img, _ =self.generator(self.real, hat_c_numpy, reuse = True)
         _, hat_cls = self.discriminator(hat_img, reuse = True)
         
@@ -253,7 +253,7 @@ class WarpGAN(object) :
         warp_cycle_loss = tf.reduce_mean((A_cycle - A)** 2, axis=[1,2,3])
         g_rec_loss = tf.reduce_mean(warp_cycle_loss)
 
-        smooth_loss = total_variation(w_fake) + total_variation(w_recon)
+        smooth_loss = tf.reduce_mean(total_variation(w_fake)) + tf.reduce_mean(total_variation(w_recon))
 
         d_adv_loss = discriminator_loss(loss_func=self.gan_type, real=real_logit, fake=fake_logit)
         d_cls_loss = classification_loss(logit=real_cls, label=label_org)
