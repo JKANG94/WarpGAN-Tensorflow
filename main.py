@@ -88,8 +88,8 @@ def main():
     Y = np.linspace(0, args.img_size-1, args.img_size, dtype = 'float32')
     AX, AY = np.meshgrid(X, Y)
     A_ = np.array([AY, AX]).transpose(1, 2, 0)
-    A_ = np.expand_dim(A_, axis = 0)
-    A_ = A_.repeat(self.batch_size, axis = 0)
+    A_ = np.expand_dims(A_, axis = 0)
+    A_ = A_.repeat(args.batch_size, axis = 0)
     A_tensor = tf.convert_to_tensor(A_)
     with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
         gan = WarpGAN(sess, args)

@@ -108,7 +108,7 @@ class WarpGAN(object) :
 
             for i in range(2) :
                 x = tf.image.resize_bilinear(x, [2 * h, 2 * w])
-                x = conv(x, channel//2, kernel=3, stride=1, pad = 1, use_bias=False, scope='conv_'+str(i))
+                x = conv(x, channel//2, kernel=3, stride=1, pad = 1, use_bias=False, scope='upconv_'+str(i))
                 x = relu(x)
                 x = batch_norm(x, scope='up_bat_norm'+str(i))
 
@@ -238,7 +238,7 @@ class WarpGAN(object) :
         dist = tf_contrib.distributions.Categorical(probs=[0.25, 0.5, 0.25])
         hat_c = dist.sample([self.batch_size, self.c_dim]) - 1
         hat_c_numpy = hat_c.eval().astype('float32')
-        hat_img, _ =self.generator(self.real, hat_c_numpy, reuse = True)
+        hat_img, _ =self.generator(self.x_real, hat_c_numpy, reuse = True)
         _, hat_cls = self.discriminator(hat_img, reuse = True)
         
         """ Define Loss """
