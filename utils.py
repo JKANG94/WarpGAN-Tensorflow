@@ -37,12 +37,9 @@ class ImageData:
         img = tf.cast(img, tf.float32) / 127.5 - 1  # 传入网络的参数已是Tensor
 
         if self.augment_flag :
-            augment_size = self.load_size + (30 if self.load_size == 256 else 15)
             p = random.random()
-
             if p > 0.5 :
-                img = augmentation(img, augment_size)
-
+                img = augmentation(img)
 
         return img, label, fix_label
 
@@ -93,12 +90,9 @@ def load_test_data(image_path, size=128):
 
     return img
 
-def augmentation(image, aug_size):
+def augmentation(image):
     seed = random.randint(0, 2 ** 31 - 1)
-    ori_image_shape = tf.shape(image)
     image = tf.image.random_flip_left_right(image, seed=seed)
-    image = tf.image.resize_images(image, [aug_size, aug_size])
-    image = tf.random_crop(image, ori_image_shape, seed=seed)
     return image
 
 def normalize(x) :

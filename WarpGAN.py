@@ -224,8 +224,12 @@ class WarpGAN(object) :
         custom_label_fix_list = tf.transpose(create_labels(self.custom_label, self.selected_attrs), perm=[1, 0, 2])
 
         """ Define Generator, Discriminator """
-        x_fake, w_fake = self.generator(self.x_real, label_trg) # real a
-        x_recon, w_recon = self.generator(x_fake, label_org, reuse=True) # real b
+        # binary label transformation
+        dist = tf_contrib.distributions.Categorical(probs=[0.25, 0.5, 0.25])
+        hat_c = tf.cast(dist.sample([self.batch_size, self.c_dim]) - 1, dtype ='float32')
+
+        x_fake, w_fake = self.generator(self.x_real, hat_c) # real a
+        x_recon, w_recon = self.generator(x_fake, -hat_c, reuse=True) # real b
 
         real_logit, real_cls = self.discriminator(self.x_real)
         fake_logit, fake_cls = self.discriminator(x_fake, reuse=True)
@@ -233,13 +237,6 @@ class WarpGAN(object) :
         # warp cycle
         A_fake = tf_contrib.image.dense_image_warp(A, w_fake)
         A_cycle = tf_contrib.image.dense_image_warp(A_fake, w_recon)
-
-        # binary label transformation
-        dist = tf_contrib.distributions.Categorical(probs=[0.25, 0.5, 0.25])
-        hat_c = dist.sample([self.batch_size, self.c_dim]) - 1
-        hat_c_numpy = hat_c.eval().astype('float32')
-        hat_img, _ =self.generator(self.x_real, hat_c_numpy, reuse = True)
-        _, hat_cls = self.discriminator(hat_img, reuse = True)
         
         """ Define Loss """
         if self.gan_type.__contains__('wgan') or self.gan_type == 'dragan' :
@@ -248,13 +245,12 @@ class WarpGAN(object) :
             GP = 0
 
         g_adv_loss = generator_loss(loss_func=self.gan_type, fake=fake_logit)
-        g_cls_loss = binary_label_loss(hat_c_numpy, hat_cls)
+        g_cls_loss = binary_label_loss(hat_c, real_cls, self.c_dim)
 
         warp_cycle_loss = tf.reduce_mean((A_cycle - A)** 2, axis=[1,2,3])
         g_rec_loss = tf.reduce_mean(warp_cycle_loss)
 
-        smooth_loss = tf.reduce_mean(total_variation(w_fake)) + tf.reduce_mean(total_variation(w_recon))
-
+        smooth_loss = tf.reduce_mean(total_variation(w_fake))
         d_adv_loss = discriminator_loss(loss_func=self.gan_type, real=real_logit, fake=fake_logit)
         d_cls_loss = classification_loss(logit=real_cls, label=label_org)
 
