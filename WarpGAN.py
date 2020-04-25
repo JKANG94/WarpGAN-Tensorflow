@@ -245,7 +245,7 @@ class WarpGAN(object) :
             GP = 0
 
         g_adv_loss = generator_loss(loss_func=self.gan_type, fake=fake_logit)
-        g_cls_loss = binary_label_loss(hat_c, real_cls, self.c_dim)
+        g_cls_loss = binary_label_loss(hat_c, fake_cls, self.c_dim)
 
         warp_cycle_loss = tf.reduce_mean((A_cycle - A)** 2, axis=[1,2,3])
         g_rec_loss = tf.reduce_mean(warp_cycle_loss)

@@ -172,9 +172,10 @@ def binary_label_loss(hat_c, hat_cls, c_dims):
     r = tf.constant(c_dims, dtype = 'float32')
     hatnom = tf.norm(hat_c, ord = 1, axis = 1, keep_dims = True)
     h = tf.div_no_nan(r, hatnom)
-    B = tf.zeros(hat_c.shape, dtype = 'float32')
+    # B = tf.zeros(hat_c.shape, dtype = 'float32')
 
-    bar_c = tf.where(tf.equal(hat_c, -1), B, hat_c) # label operator
+    # bar_c = tf.where(tf.equal(hat_c, -1), B, hat_c) # label operator
+    bar_c = tf.max(hat_c, 0)
     Loss = tf.reduce_mean(h * tf.reduce_sum(tf.abs(hat_c) * tf.nn.sigmoid_cross_entropy_with_logits(labels=bar_c, logits=hat_cls), axis = 1))
     return Loss
 
